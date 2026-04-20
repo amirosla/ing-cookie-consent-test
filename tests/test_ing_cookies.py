@@ -16,6 +16,13 @@ def test_ing_analytical_cookie_consent(page: Page) -> None:
     """
     page.goto("https://www.ing.pl", wait_until="domcontentloaded")
 
+    # ING blocks cloud/datacenter IPs with hCaptcha — skip gracefully if detected
+    if page.locator("text=Jestem człowiekiem").is_visible():
+        pytest.skip(
+            "ING security system (hCaptcha) blocked access from this IP. "
+            "Run the test from a Polish/EU network."
+        )
+
     # --- Step 1: Click "Dostosuj" to open settings panel ---
     dostosuj = page.locator(".js-cookie-policy-main-settings-button")
     expect(dostosuj).to_be_visible(timeout=15_000)
